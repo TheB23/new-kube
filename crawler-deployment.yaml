@@ -15,12 +15,18 @@ spec:
       labels:
         app: synergychat-crawler
     spec:
+      volumes:
+        - name: crawler-volume
+          emptyDir: {}
       containers:
-        - name: synergychat-crawler
+        - name: synergychat-crawler-1
           image: bootdotdev/synergychat-crawler:latest
           envFrom:
             - configMapRef:
                 name: synergychat-crawler-configmap
+          env:
+            - name: CRAWLER_PORT
+              value: "8080"
           startupProbe:
             httpGet:
               path: /healthz
@@ -33,3 +39,52 @@ spec:
               port: 8080
             periodSeconds: 5
             failureThreshold: 3
+          volumeMounts:
+            - name: crawler-volume
+              mountPath: /cache
+        - name: synergychat-crawler-2
+          image: bootdotdev/synergychat-crawler:latest
+          envFrom:
+            - configMapRef:
+                name: synergychat-crawler-configmap
+          env:
+            - name: CRAWLER_PORT
+              value: "8081"
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            periodSeconds: 2
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            periodSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: crawler-volume
+              mountPath: /cache
+        - name: synergychat-crawler-3
+          image: bootdotdev/synergychat-crawler:latest
+          envFrom:
+            - configMapRef:
+                name: synergychat-crawler-configmap
+          env:
+            - name: CRAWLER_PORT
+              value: "8082"
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 8082
+            periodSeconds: 2
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8082
+            periodSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: crawler-volume
+              mountPath: /cache
