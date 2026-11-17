@@ -16,6 +16,9 @@ spec:
       containers:
         - name: synergychat-web
           image: bootdotdev/synergychat-web:latest
+          envFrom:
+            - configMapRef:
+                name: synergychat-web-configmap
           resources:
             limits:
               cpu: 50m
